@@ -6,9 +6,6 @@ import datetime
 from bcompiler.utils import project_data_from_master
 
 
-def otherfunction():
-    pass
-
 def first_function(Q2_master, other_master):
     ws = other_master.active
 
