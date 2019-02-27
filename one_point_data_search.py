@@ -17,8 +17,7 @@ from openpyxl.formatting.rule import Rule
 import random
 
 
-
-def data_return(project_list, data_key, dict_list):
+def data_return(dict_list, project_list, data_key):
     wb = Workbook()
     ws = wb.active
 
@@ -48,7 +47,7 @@ def data_return(project_list, data_key, dict_list):
                 col_start += 1
 
     '''quarter tag / meta data into ws'''
-    quarter_labels = get_quarter_stamp(list_of_dicts)
+    quarter_labels = get_quarter_stamp(dict_list)
     ws.cell(row=1, column=1, value='Project')
     for i, label in enumerate(quarter_labels):
         ws.cell(row=1, column=i + 2, value=label)
@@ -114,7 +113,7 @@ def conditional_formatting(worksheet):
 
 def get_all_project_names(dict_list):
     output_list = []
-    for dict in list_of_dicts:
+    for dict in dict_list:
         for name in dict:
             if name not in output_list:
                 output_list.append(name)
@@ -136,6 +135,16 @@ salmon_fill = PatternFill(start_color='ff8080',
                    end_color='ff8080',
                    fill_type='solid')
 
+def place_in_order(data, category):
+    category_list = []
+
+    for project_name in data:
+        category_list.append(data[project_name][category])
+
+    list(set(category_list))
+
+    return category_list
+
 '''RUNNING PROGRAMME'''
 
 ''' ONE. master data sources - this can be added to. If a quarter is not required it should be # out'''
@@ -147,14 +156,17 @@ q3_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\
 q2_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_2_2017.xlsx')
 q1_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_1_2017.xlsx')
 
-''' TWO. list of master data dictionaries. this should be consistent with mata data sources given above'''
-list_of_dicts = [q3_1819, q2_1819, q1_1819, q4_1718, q3_1718, q2_1718, q1_1718]
+''' TWO. list of master data dictionaries. There are two options. chose a tailor list, which will often by one - the 
+most recent quarter, or a combined list - this will often be all.this should be consistent with mata data sources given 
+above'''
+list_of_dicts_tailored = [q3_1819]
+list_of_dicts_all = [q3_1819, q2_1819, q1_1819, q4_1718, q3_1718, q2_1718, q1_1718]
 
 ''' THREE. Compiling list of projects. There are two options. you can return data for projects currently in the 
 portfolio in a given quarter, only. Or you can return the total number/names of projects that have been in the 
  portfolio over all the master data dictionaries stated above'''
 one_quarter_list = list(q3_1819.keys())
-combined_quarters_list = get_all_project_names(list_of_dicts)
+combined_quarters_list = get_all_project_names(list_of_dicts_all)
 
 '''FOUR. consider if it's useful to place data in a particular order'''
 # group_names = ['Rail Group', 'HSMRPG', 'International Security and Environment', 'Roads Devolution & Motoring']
@@ -164,14 +176,14 @@ combined_quarters_list = get_all_project_names(list_of_dicts)
 
 '''FIVE. set data of interest. the list previously_used is simply a place to store previous day keys of interest so they
 can be accessed again easily'''
-data_interest = 'Project stage'
+data_interest = 'BICC approval point'
 
 previously_used = ['Overall Resource DCA - Now', 'Project Delivery - Now', 'Project MM18 Forecast - Actual',
               'Project MM18 Original Baseline'  # project start date baseline 
               'Overall Resource DCA - Now', 'Real or Nominal - Actual/Forecast', 'Total Forecast',
-              'Project Delivery - Now']
+              'Project Delivery - Now', 'Project stage']
 
 '''SIX. command to run the programme'''
-run = data_return(combined_quarters_list, data_interest, list_of_dicts)
+run = data_return(list_of_dicts_tailored, one_quarter_list, data_interest)
 
-run.save('C:\\Users\\Standalone\\Will\\project_stages.xlsx')
+run.save('C:\\Users\\Standalone\\Will\\project_stages_early_dev.xlsx')
