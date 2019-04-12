@@ -148,15 +148,15 @@ def place_in_order(data, category):
 '''RUNNING PROGRAMME'''
 
 ''' ONE. master data sources - this can be added to. If a quarter is not required it should be # out'''
-q3_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_3_2018.xlsx')
-q2_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_2_2018.xlsx')
-q1_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_1_2018.xlsx')
-q4_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_4_2017.xlsx')
-q3_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_3_2017.xlsx')
-q2_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_2_2017.xlsx')
-q1_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\master_1_2017.xlsx')
+q3_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_3_2018.xlsx')
+q2_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_2_2018.xlsx')
+q1_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_1_2018.xlsx')
+q4_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_4_2017.xlsx')
+q3_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_3_2017.xlsx')
+q2_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_2_2017.xlsx')
+q1_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_1_2017.xlsx')
 
-''' TWO. list of master data dictionaries. There are two options. chose a tailor list, which will often by one - the 
+''' TWO. list of master data dictionaries. There are two options. chose a tailor list, which will often be one - the 
 most recent quarter, or a combined list - this will often be all.this should be consistent with mata data sources given 
 above'''
 list_of_dicts_tailored = [q3_1819]
@@ -176,7 +176,7 @@ combined_quarters_list = get_all_project_names(list_of_dicts_all)
 
 '''FIVE. set data of interest. the list previously_used is simply a place to store previous day keys of interest so they
 can be accessed again easily'''
-data_interest = 'BICC approval point'
+data_interest = 'Total RDEL Forecast recurring new costs'
 
 previously_used = ['Overall Resource DCA - Now', 'Project Delivery - Now', 'Project MM18 Forecast - Actual',
               'Project MM18 Original Baseline'  # project start date baseline 
@@ -184,6 +184,6 @@ previously_used = ['Overall Resource DCA - Now', 'Project Delivery - Now', 'Proj
               'Project Delivery - Now', 'Project stage']
 
 '''SIX. command to run the programme'''
-run = data_return(list_of_dicts_tailored, one_quarter_list, data_interest)
+run = data_return(list_of_dicts_all, combined_quarters_list, data_interest)
 
-run.save('C:\\Users\\Standalone\\Will\\project_stages_early_dev.xlsx')
+run.save('C:\\Users\\Standalone\\Will\\recurring_cost.xlsx')

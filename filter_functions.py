@@ -1,6 +1,6 @@
 '''
 
-planning on using this as a place to have helper functions for all filter functions. It the moment it contains a early
+planning on using this as a place to have helper functions for all filter functions. At the moment it contains a early
 dev function that places project names in a specific order, based on meta data of interest. However, wondering it might
 be better to simply place this information into ws so can be filtered there.
 
