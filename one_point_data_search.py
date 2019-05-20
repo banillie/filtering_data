@@ -8,6 +8,8 @@ reporting.
 
 Instructions are provided
 
+##TODO adapt so can also return milestone dates. have done a quick hack on this.
+
 '''
 from openpyxl import Workbook
 from bcompiler.utils import project_data_from_master
@@ -16,6 +18,74 @@ from openpyxl.styles.differential import DifferentialStyle
 from openpyxl.formatting.rule import Rule
 import random
 
+def all_milestone_data(master_data):
+    upper_dict = {}
+
+    for name in master_data:
+        p_data = master_data[name]
+        lower_dict = {}
+        for i in range(1, 50):
+            try:
+                try:
+                    lower_dict[p_data['Approval MM' + str(i)]] = p_data['Approval MM' + str(i) + ' Forecast / Actual']
+                except KeyError:
+                    lower_dict[p_data['Approval MM' + str(i)]] = p_data['Approval MM' + str(i) + ' Forecast - Actual']
+            except KeyError:
+                pass
+
+            try:
+                lower_dict[p_data['Assurance MM' + str(i)]] = p_data['Assurance MM' + str(i) + ' Forecast - Actual']
+            except:
+                pass
+
+        for i in range(18, 67):
+            try:
+                lower_dict[p_data['Project MM' + str(i)]] = p_data['Project MM' + str(i) + ' Forecast - Actual']
+            except:
+                pass
+
+        upper_dict[name] = lower_dict
+
+    return upper_dict
+
+def date_return_milestones(dict_list, project_list, data_key):
+    wb = Workbook()
+    ws = wb.active
+
+    '''lists project names in ws'''
+    for x in range(0, len(project_list)):
+        ws.cell(row=x + 2, column=1, value=project_list[x])
+
+    '''project data into ws'''
+    for row_num in range(2, ws.max_row + 1):
+        project_name = ws.cell(row=row_num, column=1).value
+        print(project_name)
+        col_start = 2
+        for i, dictionary in enumerate(dict_list):
+            if project_name in dictionary:
+                ws.cell(row=row_num, column=col_start).value = dictionary[project_name][data_key]
+                if dictionary[project_name][data_key] == None:
+                    ws.cell(row=row_num, column=col_start).value = 'None'
+                try:
+                    if dict_list[i + 1][project_name][data_key] != dictionary[project_name][data_key]:
+                        # ws.cell(row=row_num, column=col_start).font = red_text # option of red text here
+                        ws.cell(row=row_num, column=col_start).fill = salmon_fill
+                except (IndexError, KeyError):
+                    pass
+                col_start += 1
+            else:
+                ws.cell(row=row_num, column=col_start).value = 'Not reporting'
+                col_start += 1
+
+    '''quarter tag / meta data into ws'''
+    quarter_labels = get_quarter_stamp(dict_list)
+    ws.cell(row=1, column=1, value='Project')
+    for i, label in enumerate(quarter_labels):
+        ws.cell(row=1, column=i + 2, value=label)
+
+    conditional_formatting(ws)  # apply conditional formatting
+
+    return wb
 
 def data_return(dict_list, project_list, data_key):
     wb = Workbook()
@@ -148,6 +218,7 @@ def place_in_order(data, category):
 '''RUNNING PROGRAMME'''
 
 ''' ONE. master data sources - this can be added to. If a quarter is not required it should be # out'''
+q4_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_4_2018.xlsx')
 q3_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_3_2018.xlsx')
 q2_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_2_2018.xlsx')
 q1_1819 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_1_2018.xlsx')
@@ -156,16 +227,25 @@ q3_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\
 q2_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_2_2017.xlsx')
 q1_1718 = project_data_from_master('C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_1_2017.xlsx')
 
+# q4_1819 = all_milestone_data(q4_1819)
+# q3_1819 = all_milestone_data(q3_1819)
+# q2_1819 = all_milestone_data(q2_1819)
+# q1_1819 = all_milestone_data(q1_1819)
+# q4_1718 = all_milestone_data(q4_1718)
+# q3_1718 = all_milestone_data(q3_1718)
+# q2_1718 = all_milestone_data(q2_1718)
+# q1_1718 = all_milestone_data(q1_1718)
+
 ''' TWO. list of master data dictionaries. There are two options. chose a tailor list, which will often be one - the 
 most recent quarter, or a combined list - this will often be all.this should be consistent with mata data sources given 
 above'''
-list_of_dicts_tailored = [q3_1819]
-list_of_dicts_all = [q3_1819, q2_1819, q1_1819, q4_1718, q3_1718, q2_1718, q1_1718]
+list_of_dicts_tailored = [q4_1819]
+list_of_dicts_all = [q4_1819, q3_1819, q2_1819, q1_1819, q4_1718, q3_1718, q2_1718, q1_1718]
 
 ''' THREE. Compiling list of projects. There are two options. you can return data for projects currently in the 
 portfolio in a given quarter, only. Or you can return the total number/names of projects that have been in the 
  portfolio over all the master data dictionaries stated above'''
-one_quarter_list = list(q3_1819.keys())
+one_quarter_list = list(q4_1819.keys())
 combined_quarters_list = get_all_project_names(list_of_dicts_all)
 
 '''FOUR. consider if it's useful to place data in a particular order'''
@@ -176,7 +256,7 @@ combined_quarters_list = get_all_project_names(list_of_dicts_all)
 
 '''FIVE. set data of interest. the list previously_used is simply a place to store previous day keys of interest so they
 can be accessed again easily'''
-data_interest = 'Total RDEL Forecast recurring new costs'
+data_interest = 'Total Budget/BL'
 
 previously_used = ['Overall Resource DCA - Now', 'Project Delivery - Now', 'Project MM18 Forecast - Actual',
               'Project MM18 Original Baseline'  # project start date baseline 
@@ -186,4 +266,4 @@ previously_used = ['Overall Resource DCA - Now', 'Project Delivery - Now', 'Proj
 '''SIX. command to run the programme'''
 run = data_return(list_of_dicts_all, combined_quarters_list, data_interest)
 
-run.save('C:\\Users\\Standalone\\Will\\recurring_cost.xlsx')
+run.save('C:\\Users\\Standalone\\Will\\total_bl.xlsx')
