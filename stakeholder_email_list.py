@@ -6,10 +6,8 @@ from openpyxl import load_workbook
 from bcompiler.utils import project_data_from_master
 import re
 
-def get_stakeholder_list(stakeholder_dict):
+def get_stakeholder_list(stakeholder_dict, project_list):
     output_list = []
-
-    project_list = stakeholder_dict.keys()
 
     for project in project_list:
         commission = stakeholder_dict[project]['Commission']
@@ -43,6 +41,18 @@ def get_stakeholder_list(stakeholder_dict):
 
     return final_final_list
 
+def filter_mode(stakeholder_dict, mode):
+    output_list = []
+
+    for project in stakeholder_dict.keys():
+        if stakeholder_dict[project]['Mode'] == mode:
+            output_list.append(project)
+
+    return output_list
+
 stakeholders = project_data_from_master('C:\\Users\\Standalone\\Will\\Portfolio_Contact_List_Q4_1819.xlsx')
 
-email_list = get_stakeholder_list(stakeholders)
+roads_projects = filter_mode(stakeholders, 'Road')
+specific_projects = ['Manchester North West Quadrant', 'Oxford-Cambridge Expressway ']
+
+email_list = get_stakeholder_list(stakeholders, specific_projects)
